@@ -1,0 +1,16 @@
+*.pyc
+.idea/
+
+
+*.log
+*.sqlite
+.DS_Store
+ehthumbs.db
+Icon
+Thumbs.db
+.tmtags
+tags
+vendor.tags
+tmtagsHistory
+node_modules/
+semantic/

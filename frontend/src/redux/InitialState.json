@@ -1,0 +1,15 @@
+{
+  "allShortFormattedPatients" : {
+    "allPatients": [
+
+    ],
+    "fetching": false,
+    "separatedBy": 1,
+    "sortedBy": 0,
+    "toggleValue": 0,
+    "pageNum": 0,
+    "perPage": 15,
+    "errors": []
+  }
+}
+
