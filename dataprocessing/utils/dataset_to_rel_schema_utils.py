@@ -1,12 +1,11 @@
 import re
 from contextlib import suppress
-import collections
 
 from dataprocessing.utils.utils import is_number
 
 FIELD_TYPES = {
     "NUMBER_TYPE": "{} = models.FloatField(max_length=128, null=True)",
-    "STRING_TYPE": "{} = CharField(max_length=64, default='')"  # The max in dataset is 37
+    "STRING_TYPE": "{} = CharField(max_length=64, default='')"  # The max length of values in dataset is 37
 }
 
 
@@ -16,16 +15,11 @@ def is_boolean(value):
     return False
 
 
-# TODO: Not working
-def is_date(value):
-    return True if re.fullmatch(r'^(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d$', value) else False
-
-
 # for key, value in field_length.items():
 #   print(f'{key:55.50} : {value}')
 def find_types_of_the_fields(patients):
     """Fetch values from all patients and save them in a map of sets.
-    Then, reduce the sets to one value figuring out what type of
+    Then, reduce the sets to one value, thus, producing the type of
     value a corresponding field represents. """
 
     field_types = {}
@@ -49,8 +43,6 @@ def find_types_of_the_fields(patients):
             field_types[key] = "STRING_TYPE"
 
     return field_types
-    # If all fields contain numbers except only for one field which is 'NA'
-    # then the field is a Number.
 
 
 def find_non_nested_features(patients, entity='patient.'):
@@ -81,10 +73,3 @@ def generate_attributes_for_specific_model(fields):
 
         # fields = list(find_non_nested_features(patients, entity='patient.'))
         # django_fields = generate_attributes_for_model(fields)
-
-
-# from dataprocessing.utils.retrieve_features import open_file_and_convert_to_key_value_pairs
-# from dataprocessing.utils.dataset_to_rel_schema_utils import *
-# patients = open_file_and_convert_to_key_value_pairs()
-# generate_fields_for_patient(patients)
-

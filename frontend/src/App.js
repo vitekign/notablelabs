@@ -1,9 +1,4 @@
 import React, {Component} from 'react';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
-import DataSet from "./containers/DataSet";
-import logo from './media/images/NotableLabs-Logo-01.png'
-import DetailedInfo from './components/DetailedInfo'
-import Whoops404 from './components/Whoop404'
 import {
     HashRouter,
     Route,
@@ -11,11 +6,12 @@ import {
 
 } from 'react-router-dom'
 
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 
-
-
-
-
+import DataSet from "./containers/DataSet";
+import DetailedInfo from './containers/DetailedInfo'
+import NotFound404 from './components/NotFound404'
+import logo from './media/images/NotableLabs-Logo-01.png'
 
 class App extends Component {
     render() {
@@ -35,9 +31,7 @@ class App extends Component {
                             </MuiThemeProvider>
                         )}/>
                         <Route path="/detailed_info/:id" component={DetailedInfo}/>
-                        <Route component={Whoops404}/>
-                        {/*if nothing was matched fire the last option*/}
-                        {/*in the router switch statement*/}
+                        <Route component={NotFound404}/>
                     </Switch>
                 </div>
             </HashRouter>

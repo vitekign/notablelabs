@@ -4,27 +4,49 @@
   "private": true,
   "dependencies": {
     "isomorphic-fetch": "^2.2.1",
+    "lodash": "^4.17.4",
     "material-ui": "^0.20.0",
     "material-ui-icons": "^1.0.0-beta.17",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
+    "react-key-index": "^0.1.1",
     "react-redux": "^5.0.6",
     "react-router-dom": "^4.2.2",
     "react-scripts": "1.0.17",
     "redux": "^3.7.2",
     "redux-thunk": "^2.2.0",
-    "semantic-ui": "^2.2.13"
+    "semantic-ui": "^2.2.13",
+    "uuid": "^3.1.0"
+  },
+  "jest": {
+    "setupFiles": [
+      "./__tests__/global.js"
+    ],
+    "modulePathIgnorePatterns": [
+      "global.js"
+    ],
+    "moduleNameMapper": {
+      "\\.(scss)$": "<rootDir>/node_modules/jest-css-modules",
+      "\\.(css)$": "<rootDir>/node_modules/jest-css-modules"
+    }
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
+    "test": "jest",
     "eject": "react-scripts eject",
     "redux": "./node_modules/.bin/babel-node ./src/redux/index.js"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
+    "babel-jest": "^22.0.4",
     "babel-preset-latest": "^6.24.1",
-    "babel-preset-stage-0": "^6.24.1"
+    "babel-preset-stage-0": "^6.24.1",
+    "deep-freeze": "0.0.1",
+    "enzyme": "^3.3.0",
+    "enzyme-adapter-react-16": "^1.1.1",
+    "jest-cli": "^22.0.4",
+    "jest-css-modules": "^1.1.0",
+    "react-addons-test-utils": "^15.6.2"
   }
 }

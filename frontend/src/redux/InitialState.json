@@ -1,15 +1,41 @@
 {
-  "allShortFormattedPatients" : {
+  "allShortFormattedPatients": {
     "allPatients": [
-
+    ],
+    "allPatientsImmutable": [
     ],
     "fetching": false,
-    "separatedBy": 1,
-    "sortedBy": 0,
+    "separatedBy": "patient_id",
+    "sortedBy": "patient_id",
     "toggleValue": 0,
     "pageNum": 0,
-    "perPage": 15,
-    "errors": []
+    "perPage": 5,
+    "errors": [],
+    "currentDetailedPatientNum": 2808,
+    "sortAscDesc": {
+      "patient_id": 0,
+      "gender": 0,
+      "ethnicity": 0,
+      "platelet_result_count": 0,
+      "vital_status": 0
+    }
+  },
+  "fetchingDetails": false,
+  "curDetails": {
+    "patientDetails": [],
+    "admin": [],
+    "cytogeneticAbnormalities": [],
+    "fishTestComponentResults": [],
+    "immunophenotypeCytochemistryTestingResults": [],
+    "molecularAnalysisAbnormalityTestingResults": []
+  },
+  "curDetailsImmutable": {
+    "patientDetails": [],
+    "admin": [],
+    "cytogeneticAbnormalities": [],
+    "fishTestComponentResults": [],
+    "immunophenotypeCytochemistryTestingResults": [],
+    "molecularAnalysisAbnormalityTestingResults": []
   }
 }
 

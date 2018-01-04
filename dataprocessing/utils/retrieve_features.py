@@ -1,6 +1,10 @@
 import os
+import sys
+sys.path.append('../')
+sys.path.append('../../')
 import django
-# Must include the following two lines; otherwise, the module will crash!
+
+# # Must include the following two lines; otherwise, the module will crash!
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "notablelabs.settings")
 django.setup()
 
@@ -18,10 +22,13 @@ CANCER_STUDIES_PATH = os.path.join(settings.BASE_DIR, "datasets", "cancer_studie
 CANCER_DATASET_FOLDER_NAME = CANCER_DATA_SET_DOWNLOAD_PATH.split("/").pop(-1).replace(".tar.gz", "")
 CANCER_FILE_PATH = os.path.join(CANCER_STUDIES_PATH, CANCER_DATASET_FOLDER_NAME, CANCER_DATA_SET_FILE_NAME)
 
+IGNORED_FIELDS = {"patient.fish_test_component_results"}
+LOGGING = False
+
 
 def download_dataset(dataset_url=CANCER_DATA_SET_DOWNLOAD_PATH, dataset_path=CANCER_STUDIES_PATH,
                      file_name=CANCER_DATASET_FOLDER_NAME):
-    """Download the archive from the Internet, save it and unpack it."""
+    """Download an archive from the Internet, save and unpack it."""
     try:
         if not os.path.isdir(dataset_path):
             os.makedirs(dataset_path)
@@ -35,8 +42,8 @@ def download_dataset(dataset_url=CANCER_DATA_SET_DOWNLOAD_PATH, dataset_path=CAN
     dataset_tgz.close()
 
 
-def open_file_and_convert_to_key_value_pairs(file_name=CANCER_FILE_PATH):
-    """Fetch the data from the file and convert all data points
+def open_file_and_convert_to_key_value_pairs(file_name=CANCER_FILE_PATH, display=False):
+    """Retrieve data from a file and convert all data points
     into corresponding patients and their features."""
     features = []
     with open(file_name, encoding="UTF8") as fh:
@@ -49,7 +56,8 @@ def open_file_and_convert_to_key_value_pairs(file_name=CANCER_FILE_PATH):
     features_in_groups = {}
     # First value is a feature name.
     for feature in features:
-        features_in_groups[feature[0]] = feature[1:]
+        if feature[0] not in IGNORED_FIELDS:
+            features_in_groups[feature[0]] = feature[1:]
 
     patients = [{} for _ in range(200)]
 
@@ -57,8 +65,9 @@ def open_file_and_convert_to_key_value_pairs(file_name=CANCER_FILE_PATH):
         for num, value in enumerate(values):
             patients[num][key] = value
 
-    print(f"The number of patients is: {len(patients):^5}")
-    print(f"The number of fields/features in one patient is: {len(patients[0]):^5}")
+    if display:
+        print(f"The number of patients is: {len(patients):^5}")
+        print(f"The number of fields/features in one patient is: {len(patients[0]):^5}")
 
     return patients
 
@@ -85,6 +94,8 @@ def find_non_nested_features(patients, entity='patient.'):
         match = re.fullmatch(r'.*\..*\..*', key)
         if match is None and entity in key:
             yield key
+
+
 # list(find_non_nested_features(patients))
 
 
@@ -95,8 +106,6 @@ def get_list_of_non_nested_properties_for_patient(patients):
     return props
 
 
-# for datapoint in sorted(find_set_of_unique_nested_features(patients), key=len):
-#    print(datapoint)
 def find_set_of_unique_nested_features(patients):
     """Find all unique nested features. """
     return set([re.sub(r'-[0-9]+', '', feature) for feature in list(find_nested_features(patients))])
@@ -114,11 +123,32 @@ def get_length_of_the_longest_value_in(patients):
 def get_features(patients):
     """features = list(get_features(patients))"""
     for key, _ in patients[0].items():
-        yield(key)
+        yield (key)
+
+
+def extract_number(s):
+    match_digits = re.search(r'\d+', s)
+    if match_digits:
+        return match_digits.group()
+    return 0
+
+
+class FishTestResult:
+    fish_test_component = ''
+    fish_test_component_percentage_value = ''
+
+
+class ImmunoCytoResult:
+    immunophenotype_cytochemistry_percent_positive = ''
+    immunophenotype_cytochemistry_testing_result = ''
+
+
+class MolecAbnormsResult:
+    molecular_analysis_abnormality_testing_percentage_value = ''
+    molecular_analysis_abnormality_testing_result = ''
 
 
 def populate_database():
-    LOGGING = False
 
     patients = open_file_and_convert_to_key_value_pairs()
     patient_non_nested_attrs = set(find_non_nested_features(patients))
@@ -128,11 +158,16 @@ def populate_database():
     Admin.objects.all().delete()
     Patient.objects.all().delete()
     CytogeneticAbnormalities.objects.all().delete()
+    FishTestComponentResults.objects.all().delete()
+    ImmunophenotypeCytochemistryTestingResults.objects.all().delete()
 
     field_types = find_types_of_the_fields(patients)
 
     for one_patient in patients:
         cytogenetic_abnormalities_list = []
+        fish_test_dict = {}
+        immuno_cyto_dict = {}
+        molecul_abnorm_dict = {}
 
         race, new_race_added = RaceList.objects.get_or_create(race=one_patient['patient.race_list.race'])
         withdrawn_value = False if one_patient['admin.patient_withdrawal.withdrawn'] == 'false' else True
@@ -140,18 +175,63 @@ def populate_database():
         admin = Admin.objects.create(patient_withdrawal=withdrawal)
         patient = Patient.objects.create(admin=admin, race_list=race)
         for key, value in one_patient.items():
+
+            if 'molecular_analysis_abnormality_testing_percentage_value' in key:
+                molec_abnorm_num = extract_number(key)
+                if value == 'NA':
+                    molecul_abnorm_dict.setdefault(int(molec_abnorm_num),
+                                                   MolecAbnormsResult()).molecular_analysis_abnormality_testing_percentage_value = None
+                else:
+                    molecul_abnorm_dict.setdefault(int(molec_abnorm_num),
+                                                   MolecAbnormsResult()).molecular_analysis_abnormality_testing_percentage_value = float(value)
+
+            elif 'molecular_analysis_abnormality_testing_result' in key:
+                molec_abnorm_num = extract_number(key)
+                molecul_abnorm_dict.setdefault(int(molec_abnorm_num),
+                                               MolecAbnormsResult()).molecular_analysis_abnormality_testing_result = value
+
+            elif 'immunophenotype_cytochemistry_percent_positive' in key:
+                immuno_cyt_num = extract_number(key)
+                if value == 'NA':
+                    immuno_cyto_dict.setdefault(int(immuno_cyt_num),
+                                                ImmunoCytoResult()).immunophenotype_cytochemistry_percent_positive = None
+                else:
+                    immuno_cyto_dict.setdefault(int(immuno_cyt_num),
+                                                ImmunoCytoResult()).immunophenotype_cytochemistry_percent_positive = float(value)
+
+            elif 'immunophenotype_cytochemistry_testing_result' in key:
+                immuno_cyt_num = extract_number(key)
+                immuno_cyto_dict.setdefault(int(immuno_cyt_num),
+                                            ImmunoCytoResult()).immunophenotype_cytochemistry_testing_result = value
+
+            elif 'fish_test_component_percentage_value' in key:
+                fish_test_num = extract_number(key)
+                if value == 'NA':
+                    fish_test_dict.setdefault(int(fish_test_num),
+                                              FishTestResult()).fish_test_component_percentage_value = None
+                else:
+                    fish_test_dict.setdefault(int(fish_test_num),
+                                              FishTestResult()).fish_test_component_percentage_value = float(value)
+
+            elif 'fish_test_component_results.fish_test_component_result' in key:
+                fish_test_num = extract_number(key)
+                fish_test_dict.setdefault(int(fish_test_num),
+                                          FishTestResult()).fish_test_component = value
+
             # patient.race_list.race : white
-            if 'race_list.race' in key:
+            elif 'race_list.race' in key:
                 pass
 
             # patient.cytogenetic_abnormalities.cytogenetic_abnormality : normal
             elif 'cytogenetic_abnormalities' in key:
-                if LOGGING: print('cytogenetic_abnormalities')
+                if LOGGING:
+                    print('cytogenetic_abnormalities')
                 cytogenetic_abnormality, cyt_abn_added = CytogeneticAbnormalities.objects.get_or_create(abnormality=value)
                 cytogenetic_abnormalities_list.append(cytogenetic_abnormality)
 
             elif key in patient_non_nested_attrs and 'molecular_analysis_abnormality_testing_results' not in key:
-                if LOGGING: print('patient: {}'.format(key.split('.')[1]))
+                if LOGGING:
+                    print('patient: {}'.format(key.split('.')[1]))
                 if field_types[key] == 'NUMBER_TYPE':
                     if 'NA' not in value:
                         setattr(patient, key.split('.')[1], float(value))
@@ -161,7 +241,8 @@ def populate_database():
                     setattr(patient, key.split('.')[1], str(value))
             # admin.batch_number : 25.17.0
             elif 'admin.' in key and 'admin.patient_withdrawal.withdrawn' not in key:
-                if LOGGING: print('admin: {}'.format(key.split('.')[1]))
+                if LOGGING:
+                    print('admin: {}'.format(key.split('.')[1]))
                 setattr(admin, key.split('.')[1], value)
         race.save()
         admin.save()
@@ -172,7 +253,31 @@ def populate_database():
             cytogenetic_abnormality.save()
             patient.cytogenetic_abnormalities.add(cytogenetic_abnormality)
 
-    print(">>> data is successfully extracted into DB")
+        for num, immuno_cyto_typle in immuno_cyto_dict.items():
+            immuno_cyto_record, immuno_cyto_record_created = ImmunophenotypeCytochemistryTestingResults.objects.get_or_create(
+                immunophenotype_cytochemistry_testing_result=immuno_cyto_typle.immunophenotype_cytochemistry_testing_result,
+                immunophenotype_cytochemistry_percent_positive=immuno_cyto_typle.immunophenotype_cytochemistry_percent_positive
+            )
+            immuno_cyto_record.save()
+            patient.immunophenotype_cytochemistry_testing_results.add(immuno_cyto_record)
+
+        for num, fish_tuple in fish_test_dict.items():
+            fish_test_component_results_record, fish_test_created = FishTestComponentResults.objects.get_or_create(
+                fish_test_component=fish_tuple.fish_test_component,
+                fish_test_component_percentage_value=fish_tuple.fish_test_component_percentage_value
+            )
+            fish_test_component_results_record.save()
+            patient.fish_test_component_results.add(fish_test_component_results_record)
+
+        for num, molec_tuple in molecul_abnorm_dict.items():
+            molecul_abnorm_record, molecul_abnorm_record_saved = MolecularAnalysisAbnormalityTestingResults.objects.get_or_create(
+                molecular_analysis_abnormality_testing_result=molec_tuple.molecular_analysis_abnormality_testing_result,
+                molecular_analysis_abnormality_testing_percentage_value=molec_tuple.molecular_analysis_abnormality_testing_percentage_value
+            )
+            molecul_abnorm_record.save()
+            patient.molecular_analysis_abnormality_testing_results.add(molecul_abnorm_record)
+
+    print("------> data is successfully extracted into DB")
 
 
 if __name__ == "__main__":

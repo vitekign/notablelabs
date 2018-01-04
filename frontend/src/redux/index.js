@@ -1,17 +1,14 @@
 // Redux
-import C from '../constants/Constants'
-import appReducer from './store/reducers'
 import initialState from './InitialState.json'
-import { createStore } from 'redux'
 import storeFactory from './store/index'
 import {loadAllShortFormattedPatients} from './actions'
 
 
 
-const store = storeFactory(initialState)
-store.dispatch(
-    loadAllShortFormattedPatients()
-)
+// const store = storeFactory(initialState)
+// store.dispatch(
+//     loadAllShortFormattedPatients()
+// )
 
 
 
@@ -44,7 +41,7 @@ store.dispatch(
 // `)
 //
 // state = appReducer(state, {
-//     type: C.GET_ALL,
+//     type: C.GET_ALL_PATIENTS,
 //     payload: null
 // })
 //
@@ -114,7 +111,7 @@ store.dispatch(
 //     }
 // ]
 // const action = {
-//     type: C.GET_ALL,
+//     type: C.GET_ALL_PATIENTS,
 //     payload: {}
 // }
 //

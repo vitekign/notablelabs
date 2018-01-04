@@ -1,62 +1,48 @@
 import React, {Component} from 'react';
+import {Link} from 'react-router-dom'
+
 import {
-    Table,
-    TableBody,
-    TableHeader,
-    TableHeaderColumn,
-    TableRow,
-    TableRowColumn,
+    Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn,
 } from 'material-ui/Table';
 import Paper from 'material-ui/Paper'
-import {PATIENT_API_SHORT_FORMAT} from './../constants/Constants'
-
-import {Link} from 'react-router-dom'
-import {Avatar, deepOrange300, IconButton, purple500, TextField} from "material-ui";
+import {Avatar, IconButton, MenuItem, SelectField} from "material-ui";
 import ArrowBack from 'material-ui-icons/ArrowBack'
-
 import ArrowForward from "material-ui-icons/ArrowForward";
 
-const numerical_sep_props = new Set([PATIENT_API_SHORT_FORMAT.ID, PATIENT_API_SHORT_FORMAT.PLATELET_RESULT_COUNT])
+import {PATIENT_API_SHORT_FORMAT, BREAK_ROWS_BY} from './../constants/Constants'
+import {sortUtilFunc} from "../utils/Utils";
+
+
 
 export default class DataSetTable extends Component {
-    state = {
-        fixedHeader: true,
-        fixedFooter: false,
-        stripedRows: false,
-        showRowHover: true,
-        selectable: false,
-        multiSelectable: false,
-        enableSelectAll: false,
-        deselectOnClickaway: true,
-        showCheckboxes: false,
-    };
+    constructor() {
+        super();
 
-    sortUtilFunc(a, b, key) {
-        a = this.getValueForSorting(a, key);
-        b = this.getValueForSorting(b, key);
-        return (a < b) ? -1 : (a > b) ? 1 : 0;
+        this.components_params = {
+            fixedHeader: true,
+            fixedFooter: false,
+            stripedRows: false,
+            showRowHover: true,
+            selectable: false,
+            multiSelectable: false,
+            enableSelectAll: false,
+            deselectOnClickaway: true,
+            showCheckboxes: false,
+        };
+
+        this.numerical_sep_props = new Set([PATIENT_API_SHORT_FORMAT.ID,
+            PATIENT_API_SHORT_FORMAT.PLATELET_RESULT_COUNT])
     }
 
-// Need to use this utility function because some properties
-// must be converted to a Numeric Type. Chose not to parse due
-// to computational reasons.
-    getValueForSorting(obj, key) {
-        if (key == PATIENT_API_SHORT_FORMAT.PLATELET_RESULT_COUNT ||
-            key == PATIENT_API_SHORT_FORMAT.ID)
-            return Number(obj[key]);
-        return obj[key];
-    }
 
     onCellClick(e, rowNum, colNum) {
-        console.log(`row number: ${rowNum}, column number: ${colNum}`)
+        this.props.sortDataSet(e.target.id)
     }
 
-    onClickHeaderCells(e, rowNum, colNum) {
-        console.log(`row number: ${rowNum}, column number: ${colNum}`)
-    }
-
+    // Two different types of headers. The first one is a range-header: 2802-2821
+    // The second one is: label and count: Female:91
     injectSeparationHeader(index, i, patients, criterion, label = null) {
-        if (numerical_sep_props.has(criterion)) {
+        if (this.numerical_sep_props.has(criterion)) {
             return (
                 <TableRow key={index} style={{backgroundColor: "#222d38"}}
                 >
@@ -81,39 +67,52 @@ export default class DataSetTable extends Component {
         }
     }
 
-
     buildRows() {
-        let patients = this.props.patients;
+        const patients = this.props.patients;
         let table_rows_patients = [];
+        let back_arrow_color = '#222222';
+        let forward_arrow_color = '#c8c8c8';
+        if ((this.props.page_num + 1) * this.props.per_page < this.props.data_set_length)
+            forward_arrow_color = '#222222';
+        if (this.props.page_num === 0)
+            back_arrow_color = '#c8c8c8';
+        let num_of_pages = Math.floor(this.props.patients.length / this.props.per_page)
+        if (this.props.patients.length % this.props.per_page !== 0)
+            num_of_pages++;
 
         if (!this.props.toggle_value) {
             patients.sort((a, b) =>
-                this.sortUtilFunc(a, b, this.props.separation_criterion));
+                sortUtilFunc(a, b, this.props.separation_criterion));
 
-            let prev_label = "#(*-..-*)#"
+            let prev_label = "#(*-..-*)#";
             let filtered_patients = patients.slice(0);
             for (let i = 0, index = 0, cnt = 0; i < patients.length; i++, index++, cnt++) {
-                if (numerical_sep_props.has(this.props.separation_criterion)) {
-                    if (cnt % 20 == 0) {
-                        let label = ""
-                        filtered_patients = filtered_patients.filter(patient => Number(patient[this.props.separation_criterion]) >=
+                if (this.numerical_sep_props.has(this.props.separation_criterion)) {
+                    if (cnt % BREAK_ROWS_BY === 0) {
+                        let label = "";
+                        filtered_patients = filtered_patients.filter(patient =>
+                            Number(patient[this.props.separation_criterion]) >=
                             Number(patients[i][this.props.separation_criterion]))
-                        if (filtered_patients.length < 19) {
-                            label = String(filtered_patients[filtered_patients.length - 1][this.props.separation_criterion])
+                        if (filtered_patients.length < BREAK_ROWS_BY-1) {
+                            label = String(filtered_patients[filtered_patients.length - 1]
+                                [this.props.separation_criterion])
                         }
                         else {
-                            label = String(filtered_patients[19][this.props.separation_criterion])
-                            filtered_patients = filtered_patients.slice(20);
+                            label = String(filtered_patients[BREAK_ROWS_BY-1][this.props.separation_criterion])
+                            filtered_patients = filtered_patients.slice(BREAK_ROWS_BY);
                         }
 
-                        table_rows_patients.push(this.injectSeparationHeader(index, i, patients, this.props.separation_criterion, label))
+                        table_rows_patients.push(this.injectSeparationHeader(index, i,
+                            patients, this.props.separation_criterion, label))
                         index++;
                     }
                 } else {
                     if (patients[i][this.props.separation_criterion] !== prev_label) {
                         prev_label = patients[i][this.props.separation_criterion];
-                        const label_length = patients.filter(patient => patient[this.props.separation_criterion] === prev_label).length
-                        table_rows_patients.push(this.injectSeparationHeader(index, i, patients, this.props.separation_criterion,
+                        const label_length = patients.filter(patient =>
+                            patient[this.props.separation_criterion] === prev_label).length
+                        table_rows_patients.push(this.injectSeparationHeader(index,
+                            i, patients, this.props.separation_criterion,
                             prev_label + ": " + String(label_length)));
                         index++;
                     }
@@ -133,8 +132,8 @@ export default class DataSetTable extends Component {
                 )
             }
         } else {
-            patients.sort((a, b) =>
-                this.sortUtilFunc(a, b, PATIENT_API_SHORT_FORMAT.ID));
+
+            // Paginated Table
             table_rows_patients = patients
                 .filter((patient, i) => i < (this.props.page_num + 1) * this.props.per_page &&
                     i >= this.props.page_num * this.props.per_page)
@@ -154,6 +153,7 @@ export default class DataSetTable extends Component {
                     )
 
                 })
+
             let index = this.props.data_set_length;
             while (table_rows_patients.length < this.props.per_page) {
                 table_rows_patients.push(
@@ -165,40 +165,62 @@ export default class DataSetTable extends Component {
             }
 
             table_rows_patients.push(<TableRow key={this.props.per_page + 1}
-                                               style={{backgroundColor: "#ffffff",
-                                               height: 'auto',}} >
+                                               style={{backgroundColor: "#ffffff", height: 'auto',}}>
                 <TableRowColumn colSpan="5">
-                    <h2 style={{
-                        margin: '0px',
-                        padding: '0px',
-                        color: "#989898",
-                        textAlign: 'right',
-                    }}>
 
-                        <Avatar
-                            color='grey'
-                            backgroundColor="#E8E8E8"
-                            size={25}
-                            style={{
-                                top: '-7px', position: 'relative',
-                                marginRight: '20px'
-                            }}
+                    <IconButton
+                        style={{float: 'right'}}
+                        onClick={this.onArrowForwardClick.bind(this)}>
+                        <ArrowForward
+                            color={`${forward_arrow_color}`}
+                        > </ArrowForward>
+                    </IconButton>
 
-                        >
-                            {this.props.page_num + 1}
-                        </Avatar>
+                    <IconButton
+                        style={{float: 'right'}}
+                        onClick={this.onArrowBackClick.bind(this)}>
+                        <ArrowBack
+                            color={`${back_arrow_color}`}
+                        > </ArrowBack>
+                    </IconButton>
 
+                    <Avatar
+                        color={'grey'}
+                        backgroundColor={"#E8E8E8"}
+                        size={25}
+                        style={{
+                            float: 'right', top: '10px',
+                            position: 'relative', marginRight: '20px'
+                        }}>
+                        {num_of_pages}
+                    </Avatar>
 
-                        <IconButton
-                            onClick={this.onArrowBackClick.bind(this)}>
-                            <ArrowBack> </ArrowBack>
-                        </IconButton>
+                    <Avatar
+                        color={'grey'}
+                        backgroundColor={"#E8E8E8"}
+                        size={25}
+                        style={{
+                            float: 'right', top: '10px',
+                            position: 'relative', marginRight: '15px'
+                        }}>
+                        {this.props.page_num + 1}
+                    </Avatar>
 
-                        <IconButton
-                            onClick={this.onArrowForwardClick.bind(this)}>
-                            <ArrowForward> </ArrowForward>
-                        </IconButton>
-                    </h2>
+                    <SelectField
+                        style={{
+                            width: '60px', top: '-2px',
+                            marginRight: '12px', fontSize: '12px',
+                            float: 'right'
+                        }}
+                        value={this.props.per_page}
+                        labelStyle={{color: '#303030', left: '15px'}}
+                        underlineStyle={{display: 'none'}}
+                        onChange={this.props.setPerPage}>
+                        <MenuItem key={0} value={5} primaryText="5"/>
+                        <MenuItem key={1} value={10} primaryText="10"/>
+                        <MenuItem key={3} value={15} primaryText="15"/>
+                    </SelectField>
+
                 </TableRowColumn>
             </TableRow>)
         }
@@ -219,7 +241,7 @@ export default class DataSetTable extends Component {
     onArrowForwardClick(event) {
         let page_num = this.props.page_num;
         if ((page_num + 1) * this.props.per_page < this.props.data_set_length)
-        page_num += 1;
+            page_num += 1;
         this.props.setPageNum(page_num)
     }
 
@@ -229,34 +251,39 @@ export default class DataSetTable extends Component {
                 <Paper style={{marginLeft: '10px', width: '98%'}}
                        zDepth={2}>
                     <Table
-                        //onCellClick={this.onClickHeaderCells.bind(this)}
-                        height={this.state.height}
-                        fixedHeader={this.state.fixedHeader}
-                        fixedFooter={this.state.fixedFooter}
-                        selectable={this.state.selectable}
-                        multiSelectable={this.state.multiSelectable}>
+                        height={this.components_params.height}
+                        fixedHeader={this.components_params.fixedHeader}
+                        fixedFooter={this.components_params.fixedFooter}
+                        selectable={this.components_params.selectable}
+                        multiSelectable={this.components_params.multiSelectable}>
                         <TableHeader
-                            displaySelectAll={this.state.showCheckboxes}
-                            adjustForCheckbox={this.state.showCheckboxes}
-                            enableSelectAll={this.state.enableSelectAll}>
+                            displaySelectAll={this.components_params.showCheckboxes}
+                            adjustForCheckbox={this.components_params.showCheckboxes}
+                            enableSelectAll={this.components_params.enableSelectAll}>
 
                             <TableRow onCellClick={this.onCellClick.bind(this)}>
-                                <TableHeaderColumn tooltip="Patient's ID">ID</TableHeaderColumn>
-                                <TableHeaderColumn tooltip="Patient's Gender">Gender
+                                <TableHeaderColumn tooltip="Patient's ID"
+                                                   id={PATIENT_API_SHORT_FORMAT.ID}>ID</TableHeaderColumn>
+                                <TableHeaderColumn tooltip="Patient's Gender"
+                                                   id={PATIENT_API_SHORT_FORMAT.GENDER}>Gender
                                 </TableHeaderColumn>
-                                <TableHeaderColumn tooltip="Patient's Ethnicity">Ethnicity
+                                <TableHeaderColumn tooltip="Patient's Ethnicity"
+                                                   id={PATIENT_API_SHORT_FORMAT.ETHNICITY}>Ethnicity
                                 </TableHeaderColumn>
-                                <TableHeaderColumn tooltip="Patient's Platelet Result Count">
+                                <TableHeaderColumn tooltip="Patient's Platelet Result Count"
+                                                   id={PATIENT_API_SHORT_FORMAT.PLATELET_RESULT_COUNT}>
                                     Platelet Result
                                     Count</TableHeaderColumn>
-                                <TableHeaderColumn tooltip="Patient's Vital Status">Vital Status
+                                <TableHeaderColumn tooltip="Patient's Vital Status"
+                                                   id={PATIENT_API_SHORT_FORMAT.VITAL_STATUS}>Vital
+                                    Status
                                 </TableHeaderColumn>
                             </TableRow>
                         </TableHeader>
                         <TableBody
-                            displayRowCheckbox={this.state.showCheckboxes}
-                            deselectOnClickaway={this.state.deselectOnClickaway}
-                            stripedRows={this.state.stripedRows}>
+                            displayRowCheckbox={this.components_params.showCheckboxes}
+                            deselectOnClickaway={this.components_params.deselectOnClickaway}
+                            stripedRows={this.components_params.stripedRows}>
                             {this.buildRows.call(this)}
                         </TableBody>
                     </Table>

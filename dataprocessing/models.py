@@ -3,12 +3,10 @@ from django.db.models import Model, ManyToManyField, CharField, BooleanField
 
 
 class PatientWithdrawal(models.Model):
-    withdrawn = BooleanField(default=False, )  # What if the value is 'Na' in the dataset...
+    withdrawn = BooleanField(default=False, )
 
 
 class Admin(models.Model):
-    # TODO: ASK QUESTION - Do I need to create a one-to-many. All of the values are 'false'
-    # admin.patient_withdrawal.withdrawn
     patient_withdrawal = models.ForeignKey(PatientWithdrawal, null=True)
     batch_number = CharField(max_length=32)
     bcr = CharField(max_length=32)
@@ -20,39 +18,30 @@ class Admin(models.Model):
     year_of_dcc_upload = CharField(max_length=32)
 
 
-# patient.cytogenetic_abnormalities.cytogenetic_abnormality
 class CytogeneticAbnormalities(models.Model):
     abnormality = CharField(max_length=64)
 
 
-# patient.fish_test_component_results.fish_test_component_result.fish_test_component,
-# patient.fish_test_component_results.fish_test_component_result.fish_test_component_percentage_value,
-class FishTestComponentResults(models.Model):
-    fish_test_component = CharField(max_length=64)
-    fish_test_component_percentage = CharField(max_length=64)
-
-
-# patient.race_list.race
 class RaceList(models.Model):
     race = CharField(max_length=64, unique=True)
 
 
-# patient.immunophenotype_cytochemistry_testing_results.immunophenotype_cytochemistry_testing_result_values.immunophenotype_cytochemistry_percent_positive
-# patient.immunophenotype_cytochemistry_testing_results.immunophenotype_cytochemistry_testing_result_values.immunophenotype_cytochemistry_testing_result
+class FishTestComponentResults(models.Model):
+    fish_test_component = CharField(max_length=64, default='')
+    fish_test_component_percentage_value = models.FloatField(max_length=128, null=True)
+
+
 class ImmunophenotypeCytochemistryTestingResults(models.Model):
-    immunophenotype_cytochemistry_percent_positive = CharField(max_length=64)
-    immunophenotype_cytochemistry_testing_result = CharField(max_length=64)
+    immunophenotype_cytochemistry_testing_result = CharField(max_length=64, default='')
+    immunophenotype_cytochemistry_percent_positive = models.FloatField(max_length=128, null=True)
 
 
-#  patient.molecular_analysis_abnormality_testing_results.molecular_analysis_abnormality_testing_result_values.molecular_analysis_abnormality_testing_percentage_value
-#  patient.molecular_analysis_abnormality_testing_results.molecular_analysis_abnormality_testing_result_values.molecular_analysis_abnormality_testing_result
 class MolecularAnalysisAbnormalityTestingResults(models.Model):
-    molecular_analysis_abnormality_testing_percentage_value = CharField(max_length=64)
-    molecular_analysis_abnormality_testing_result = CharField(max_length=64)
+    molecular_analysis_abnormality_testing_result = CharField(max_length=64, default='')
+    molecular_analysis_abnormality_testing_percentage_value = models.FloatField(max_length=128, null=True)
 
 
 class Patient(models.Model):
-    cytogenetic_abnormalities_1 = CharField(max_length=64, default='cytogenetic_abnormalities')
     acute_myeloid_leukemia_calgb_cytogenetics_risk_category = CharField(max_length=64, default='')
     additional_studies = CharField(max_length=64, default='')
     age_at_initial_pathologic_diagnosis = models.FloatField(max_length=128, null=True)
@@ -135,5 +124,6 @@ class Patient(models.Model):
     race_list = models.ForeignKey(RaceList)
     cytogenetic_abnormalities = ManyToManyField(CytogeneticAbnormalities)
 
+    fish_test_component_results = ManyToManyField(FishTestComponentResults)
     immunophenotype_cytochemistry_testing_results = ManyToManyField(ImmunophenotypeCytochemistryTestingResults)
     molecular_analysis_abnormality_testing_results = ManyToManyField(MolecularAnalysisAbnormalityTestingResults)

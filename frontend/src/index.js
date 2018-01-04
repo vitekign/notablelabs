@@ -1,28 +1,36 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App';
+import {Provider} from 'react-redux'
 
-import { Provider } from 'react-redux'
+import App from './App';
+import {DEBUG_MODE} from './constants/Constants'
+import {
+    loadAllShortFormattedPatients
+} from './redux/actions'
 import sampleData from './redux/InitialState.json'
 import storeFactory from './redux/store/index'
-import {loadAllShortFormattedPatients} from './redux/actions'
+
 
 const initialState = (localStorage["redux-store"]) ?
     JSON.parse(localStorage["redux-store"]) :
-    sampleData
+    sampleData;
 
 const saveState = () =>
-    localStorage["redux-store"] = JSON.stringify(store.getState())
+    localStorage["redux-store"] = JSON.stringify(store.getState());
 
-const store = storeFactory(initialState)
-store.subscribe(saveState)
+const store = storeFactory(initialState);
+store.subscribe(saveState);
+
 
 store.dispatch(
     loadAllShortFormattedPatients()
-)
+);
 
-window.React = React
-window.store = store
+
+if (DEBUG_MODE) {
+    window.React = React;
+    window.store = store;
+}
 
 ReactDOM.render((
     <Provider store={store}>
