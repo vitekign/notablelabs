@@ -13,7 +13,6 @@ import {PATIENT_API_SHORT_FORMAT, BREAK_ROWS_BY} from './../constants/Constants'
 import {sortUtilFunc} from "../utils/Utils";
 
 
-
 export default class DataSetTable extends Component {
     constructor() {
         super();
@@ -42,29 +41,17 @@ export default class DataSetTable extends Component {
     // Two different types of headers. The first one is a range-header: 2802-2821
     // The second one is: label and count: Female:91
     injectSeparationHeader(index, i, patients, criterion, label = null) {
-        if (this.numerical_sep_props.has(criterion)) {
-            return (
-                <TableRow key={index} style={{backgroundColor: "#222d38"}}
-                >
-                    <TableRowColumn colSpan="5"><h2 style={{
-                        margin: '0px',
-                        padding: '0px',
-                        color: "white"
-                    }}> {patients[i][criterion]}{" - "}{Number(label)} </h2></TableRowColumn>
-
-                </TableRow>
-            )
-        } else {
-            return (
-                <TableRow key={index} style={{backgroundColor: "#222d38"}}>
-                    <TableRowColumn colSpan="5"><h2 style={{
-                        margin: '0px',
-                        padding: '0px',
-                        color: "white"
-                    }}> {label} </h2></TableRowColumn>
-                </TableRow>
-            )
-        }
+        let injection = label
+        if (this.numerical_sep_props.has(criterion))
+            injection = patients[i][criterion] + " - " + Number(label)
+        return (
+            <TableRow key={index} style={{backgroundColor: "#222d38"}}>
+                <TableRowColumn colSpan="5"><h2 style={{
+                    margin: '0px',
+                    padding: '0px',
+                    color: "white"
+                }}> {injection} </h2></TableRowColumn>
+            </TableRow> )
     }
 
     buildRows() {
@@ -94,12 +81,12 @@ export default class DataSetTable extends Component {
                         filtered_patients = filtered_patients.filter(patient =>
                             Number(patient[this.props.separation_criterion]) >=
                             Number(patients[i][this.props.separation_criterion]))
-                        if (filtered_patients.length < BREAK_ROWS_BY-1) {
+                        if (filtered_patients.length < BREAK_ROWS_BY - 1) {
                             label = String(filtered_patients[filtered_patients.length - 1]
                                 [this.props.separation_criterion])
                         }
                         else {
-                            label = String(filtered_patients[BREAK_ROWS_BY-1][this.props.separation_criterion])
+                            label = String(filtered_patients[BREAK_ROWS_BY - 1][this.props.separation_criterion])
                             filtered_patients = filtered_patients.slice(BREAK_ROWS_BY);
                         }
 
