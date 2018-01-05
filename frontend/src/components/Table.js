@@ -72,10 +72,11 @@ export default class DataSetTable extends Component {
         let table_rows_patients = [];
         let back_arrow_color = '#222222';
         let forward_arrow_color = '#c8c8c8';
-        if ((this.props.page_num + 1) * this.props.per_page < this.props.data_set_length)
+        if ((this.props.page_num + 1) * this.props.per_page < this.props.patients.length)
             forward_arrow_color = '#222222';
         if (this.props.page_num === 0)
             back_arrow_color = '#c8c8c8';
+
         let num_of_pages = Math.floor(this.props.patients.length / this.props.per_page)
         if (this.props.patients.length % this.props.per_page !== 0)
             num_of_pages++;
@@ -240,7 +241,7 @@ export default class DataSetTable extends Component {
     // (2+1) * 67 < 200 = 201 < 200:= False:= State at the current page [stay at 3]
     onArrowForwardClick(event) {
         let page_num = this.props.page_num;
-        if ((page_num + 1) * this.props.per_page < this.props.data_set_length)
+        if ((page_num + 1) * this.props.per_page < this.props.patients.length)
             page_num += 1;
         this.props.setPageNum(page_num)
     }
