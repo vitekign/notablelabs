@@ -3,6 +3,7 @@ import fetch from 'isomorphic-fetch'
 import C from '../constants/Constants'
 import {API_PATH} from '../constants/Constants'
 import {cleanDataSet, getResourceName, reshapeDataSet} from "../utils/Utils";
+import * as _ from "lodash";
 
 const RESOURCE_NAME = getResourceName(window.location.hostname);
 
@@ -18,6 +19,9 @@ export const loadAllShortFormattedPatients = () => (dispatch) => {
                 type: C.GET_ALL_PATIENTS,
                 payload: patients
             });
+            dispatch(
+                updatePatientsInTableOnChange()
+        )
         })
         .catch(error => {
             dispatch(
@@ -29,13 +33,28 @@ export const loadAllShortFormattedPatients = () => (dispatch) => {
         });
 };
 
-export const updatePatientsInTableOnChange = (userInput, immutableShortFormattedPatients) => ({
-    type: C.FILTER_PATIENTS,
-    payload: {
-        "userInput": userInput,
-        "allPatientsImmutable": immutableShortFormattedPatients
-    }
-});
+
+export const filterFishTests = user_input => (dispatch, getState) => {
+    dispatch({
+        type: C.FILTER_FISH_TEST_COMPONENT_RESULTS,
+        payload: {
+            user_input: user_input,
+            fish_tests: getState().patientDetailedInfoImmutable.fishTestComponentResultsImmutable
+        }
+    })
+};
+
+
+export const updatePatientsInTableOnChange = () => (dispatch, getState) => {
+    dispatch({
+        type: C.FILTER_PATIENTS,
+        payload: {
+            userInput: getState().allShortFormattedPatients.userInput,
+            allPatientsImmutable: _.cloneDeep(getState().allShortFormattedPatients.allPatientsImmutable)
+        }
+    })
+}
+
 
 export const setAscDesc = (criterion) => ({
     type: C.CHANGE_ASC_DESC,
@@ -56,6 +75,12 @@ export const sort = criterion => (dispatch, getState) => {
         }
     })
 };
+
+export const setUserInputAllPatients = (user_input) => ({
+    type: C.SET_USER_INPUT_ALL_PATIENTS,
+    payload: user_input
+
+})
 
 export const filterDetails = user_input => (dispatch, getState) => {
     dispatch({
@@ -113,15 +138,6 @@ export const filterMolecular = user_input => (dispatch, getState) => {
     })
 };
 
-export const filterFishTests = user_input => (dispatch, getState) => {
-    dispatch({
-        type: C.FILTER_FISH_TEST_COMPONENT_RESULTS,
-        payload: {
-            user_input: user_input,
-            fish_tests: getState().patientDetailedInfoImmutable.fishTestComponentResultsImmutable
-        }
-    })
-};
 
 export const setCurrentDetailedPatientNum = user_input => (dispatch) => {
     dispatch({

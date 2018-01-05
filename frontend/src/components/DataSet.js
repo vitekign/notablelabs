@@ -7,6 +7,7 @@ import SearchBar from './SearchBar'
 import Table from './Table'
 
 class DataSet extends Component {
+
     render() {
         if (this.props.fetching_all_patients)
             return (
@@ -44,6 +45,7 @@ class DataSet extends Component {
                     margin={"10px"}
                     width={"98%"}
                     update={this.props.updatePatientsInTable.bind(this)}
+                    user_input = {this.props.user_input}
                 />
                 <Toggle
                     label="Paginated"

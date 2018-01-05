@@ -17,7 +17,7 @@ class Search extends Component {
         return (
                 <TextField
                     id={"user_input"}
-                    defaultValue={""}
+                    defaultValue={this.props.user_input}
                     floatingLabelText={this.props.floatingLabelText}
                     hintText={this.props.hintText}
                     style={{marginLeft: `${this.props.margin}`, width: `${this.props.width}`}}

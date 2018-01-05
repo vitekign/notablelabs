@@ -1,4 +1,4 @@
-import appReducer from './reducers'
+import appReducer, {userInput} from './reducers'
 import thunk from 'redux-thunk'
 import {createStore, applyMiddleware} from 'redux'
 
@@ -11,7 +11,7 @@ const consoleMessages = (store) => (next) => (action) => {
 
     let {allShortFormattedPatients: {allPatients, fetching, sortedBy, toggleValue,
                                      separatedBy, perPage, allPatientsImmutable,
-                                     pageNum, errors }} = store.getState();
+                                     pageNum, errors, userInput}} = store.getState();
 
     console.log(`
         all patients: ${allPatients.length}
@@ -22,6 +22,7 @@ const consoleMessages = (store) => (next) => (action) => {
         sorted by: "${sortedBy}"
         toggle value: ${toggleValue}
         separated by: "${separatedBy}"
+        user input: "${userInput}
         errors: ${errors}
     `);
 

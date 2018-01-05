@@ -43,6 +43,15 @@ export const allPatients = (state = [], action) => {
     }
 };
 
+export const userInput = (state = "", action) => {
+    switch (action.type){
+        case C.SET_USER_INPUT_ALL_PATIENTS:
+            return action.payload
+        default:
+            return state
+    }
+}
+
 export const allPatientsImmutable = (state = [], action) => {
     switch (action.type) {
         case C.GET_ALL_PATIENTS:
@@ -333,6 +342,7 @@ export default combineReducers({
     allShortFormattedPatients: combineReducers({
         allPatients,
         allPatientsImmutable,
+        userInput,
         fetching,
         separatedBy,
         sortedBy,

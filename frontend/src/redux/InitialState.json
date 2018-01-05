@@ -4,6 +4,7 @@
     ],
     "allPatientsImmutable": [
     ],
+    "userInput": "",
     "fetching": false,
     "separatedBy": "patient_id",
     "sortedBy": "patient_id",
