@@ -3,6 +3,8 @@ import {PATIENT_API_SHORT_FORMAT} from '../constants/Constants'
 export const getResourceName = (hostname) => {
     if (hostname.indexOf('165.227') >= 0)
         return 'http://165.227.52.154/';
+    else if(hostname.indexOf('protected-stream-16309') >= 0)
+        return 'https://calm-ravine-14725.herokuapp.com/'
     return 'http://127.0.0.1:8000/';
 };
 
@@ -110,27 +112,27 @@ export const cleanDataSet = (details) => {
     }
 };
 
-//Filter nested Objects. Removes all fields which
-//don't match user input.
-export const updateDetailsInTablesUtil = (details, user_input) => {
-    user_input = String(user_input).toLowerCase();
-    for (let [key, element] of Object.entries(details)) {
-        if (details.hasOwnProperty(key) && details[key] !== null) {
-            if (this.pair_wise_tables.has(key))
-                this.updatePairWiseRows(element, user_input);
-            else if (details[key].constructor === Object &&
-                details[key].constructor !== Array)
-                updateDetailsInTablesUtil(element, user_input);
-            else if (element.constructor === Array) {
-                for (let j = 0; j < element.length; j++)
-                    updateDetailsInTablesUtil(element[j], user_input);
-            }
-            else if (String(key).toLowerCase().indexOf(user_input) < 0) {
-                delete details[key];
-            }
-        }
-    }
-};
+// The functionality has been moved into Reducers.
+
+// export const updateDetailsInTablesUtil = (details, user_input) => {
+//     user_input = String(user_input).toLowerCase();
+//     for (let [key, element] of Object.entries(details)) {
+//         if (details.hasOwnProperty(key) && details[key] !== null) {
+//             if (this.pair_wise_tables.has(key))
+//                 this.updatePairWiseRows(element, user_input);
+//             else if (details[key].constructor === Object &&
+//                 details[key].constructor !== Array)
+//                 updateDetailsInTablesUtil(element, user_input);
+//             else if (element.constructor === Array) {
+//                 for (let j = 0; j < element.length; j++)
+//                     updateDetailsInTablesUtil(element[j], user_input);
+//             }
+//             else if (String(key).toLowerCase().indexOf(user_input) < 0) {
+//                 delete details[key];
+//             }
+//         }
+//     }
+// };
 
 export const process_headers = compose(
     removeUnderscores,
