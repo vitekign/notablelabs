@@ -8,7 +8,7 @@ import {
     setPerPage,
     setSortedBy,
     sort,
-    setUserInputAllPatients
+    setUserInputAllPatients, setAscDesc
 } from '../redux/actions'
 import {MAX_LENGTH_USER_INPUT} from "../constants/Constants";
 
@@ -29,9 +29,12 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch,) => {
 
     return {
-        changeSeparationCriterion(event, index, criterion) {
+        setSeparatedBy(event, index, criterion) {
             dispatch(
                 setSeparatedBy(criterion)
+            )
+            dispatch(
+                sort()
             )
         },
 
@@ -39,6 +42,9 @@ const mapDispatchToProps = (dispatch,) => {
             toggleInput = toggleInput ? 1 : 0;
             dispatch(
                 setToggleValue(toggleInput)
+            )
+            dispatch(
+                sort()
             )
         },
         setPageNum(pageNum) {
@@ -54,13 +60,26 @@ const mapDispatchToProps = (dispatch,) => {
                 setPerPage(perPage)
             );
         },
-        sortDataSet(criterion) {
+
+        setSortedBy(criterion) {
             dispatch(
                 setSortedBy(criterion)
             );
             dispatch(
-                sort(criterion)
+                sort()
+            )
+        },
+
+        sortDataSet() {
+            dispatch(
+                sort()
             );
+        },
+
+        setAscDesc(criterion){
+            dispatch(
+                setAscDesc(criterion)
+            )
         },
 
         updatePatientsInTable(userInput) {
@@ -77,11 +96,15 @@ const mapDispatchToProps = (dispatch,) => {
                 dispatch(
                     updatePatientsInTableOnChange()
                 )
+                dispatch(
+                    sort()
+                )
             } else {
 
                 dispatch(
                     updatePatientsInTableOnChange()
                 )
+                dispatch(sort())
 
                 dispatch(
                     setPageNum(0)

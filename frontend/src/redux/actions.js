@@ -1,7 +1,7 @@
 import fetch from 'isomorphic-fetch'
 
 import C from '../constants/Constants'
-import {API_PATH} from '../constants/Constants'
+import {API_PATH, ASCDESC} from '../constants/Constants'
 import {cleanDataSet, getResourceName, reshapeDataSet} from "../utils/Utils";
 import * as _ from "lodash";
 
@@ -19,16 +19,21 @@ export const loadAllShortFormattedPatients = () => (dispatch) => {
                 type: C.GET_ALL_PATIENTS,
                 payload: patients
             });
+
             dispatch(
                 updatePatientsInTableOnChange()
-        )
+            )
+            dispatch(
+                sort()
+            )
+
         })
         .catch(error => {
             dispatch(
                 addError(error.message)
             );
 
-            //TODO: Cancel fetching, display mistakes and say sorry...
+            //TODO: Cancel fetching, display errors and say sorry...
             throw `${error}`
         });
 };
@@ -55,25 +60,30 @@ export const updatePatientsInTableOnChange = () => (dispatch, getState) => {
     })
 }
 
-
 export const setAscDesc = (criterion) => ({
     type: C.CHANGE_ASC_DESC,
     payload: criterion
 });
 
-export const sort = criterion => (dispatch, getState) => {
-    dispatch(
-        setAscDesc(criterion)
-    );
+export const sort = () => (dispatch, getState) => {
 
-    dispatch({
-        type: C.SORT_PATIENTS,
-        payload: {
-            criterion: criterion,
-            asc_desc: getState().allShortFormattedPatients
-                .sortAscDesc
-        }
-    })
+    if (getState().allShortFormattedPatients.toggleValue === 1) {
+        dispatch({
+            type: C.SORT_PATIENTS,
+            payload: {
+                criterion: getState().allShortFormattedPatients.sortedBy,
+                asc_desc: getState().allShortFormattedPatients.sortAscDesc[getState().allShortFormattedPatients.sortedBy]
+            }
+        })
+    } else {
+        dispatch({
+            type: C.SORT_PATIENTS,
+            payload: {
+                criterion: getState().allShortFormattedPatients.separatedBy,
+                asc_desc: ASCDESC.DESC
+            }
+        })
+    }
 };
 
 export const setUserInputAllPatients = (user_input) => ({
@@ -226,7 +236,7 @@ export const loadDetailedInfoForAPatient = () => (dispatch, getState) => {
                 addError(error.message)
             );
 
-            //TODO: Cancel fetching, display mistakes and say sorry...
+            //TODO: Cancel fetching, display errors and say sorry...
             throw `${error}`
 
         });

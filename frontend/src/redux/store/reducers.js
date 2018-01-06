@@ -30,7 +30,7 @@ export const allPatients = (state = [], action) => {
             }
 
         case C.SORT_PATIENTS:
-            if (action.payload.asc_desc[action.payload.criterion]) {
+            if (action.payload.asc_desc) {
                 return [...state.sort((a, b) =>
                     sortUtilFunc(a, b, action.payload.criterion))];
             }

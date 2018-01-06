@@ -10,6 +10,11 @@ export const PATIENT_API_SHORT_FORMAT = {
     VITAL_STATUS: 'vital_status',
 };
 
+export const ASCDESC = {
+    ASC: 0,
+    DESC: 1,
+}
+
 export const RELOADING_COLOR = '#00dda6'
 
 const constants ={

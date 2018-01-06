@@ -5,7 +5,7 @@ import {Provider} from 'react-redux'
 import App from './App';
 import {DEBUG_MODE} from './constants/Constants'
 import {
-    loadAllShortFormattedPatients, updatePatientsInTableOnChange
+    loadAllShortFormattedPatients, sort
 } from './redux/actions'
 import sampleData from './redux/InitialState.json'
 import storeFactory from './redux/store/index'
@@ -20,6 +20,7 @@ const saveState = () =>
 
 const store = storeFactory(initialState);
 store.subscribe(saveState);
+
 
 store.dispatch(
     loadAllShortFormattedPatients(),

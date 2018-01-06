@@ -4,9 +4,15 @@ import {CardText, CircularProgress, MenuItem, SelectField, Toggle} from "materia
 import {PATIENT_API_SHORT_FORMAT, RELOADING_COLOR} from '../constants/Constants'
 import {switch_styles} from '../media/styles/DataSet_style'
 import SearchBar from './SearchBar'
-import Table from './Table'
+import DataSetTable from './DataSetTable'
 
 class DataSet extends Component {
+
+
+    constructor(props){
+        super(props)
+    }
+
 
     render() {
         if (this.props.fetching_all_patients)
@@ -27,7 +33,7 @@ class DataSet extends Component {
             <SelectField
                 style={{margin: 0, marginLeft: 35, marginTop: '-10px'}}
                 value={this.props.separation_criterion}
-                onChange={this.props.changeSeparationCriterion}
+                onChange={this.props.setSeparatedBy}
                 floatingLabelText="Separate Patients By:">
                 <MenuItem key={1} value={PATIENT_API_SHORT_FORMAT.ID} primaryText="ID"/>
                 <MenuItem key={2} value={PATIENT_API_SHORT_FORMAT.GENDER} primaryText="Gender"/>
@@ -37,6 +43,7 @@ class DataSet extends Component {
                                   primaryText="Vital Status"/>
             </SelectField>
             : null;
+
         return (
             <div className="Projects">
                 <SearchBar
@@ -63,7 +70,9 @@ class DataSet extends Component {
                 />
                 {selectField}
                 <div style={{clear: 'both', marginBottom: '15px'}}></div>
-                <Table patients={this.props.mutable_patients}
+
+                <DataSetTable patients={this.props.mutable_patients}
+                       mutable_patients={this.props.mutable_patients}
                        separation_criterion={this.props.separation_criterion}
                        toggle_value={this.props.toggle_value}
                        data_set_length={this.props.immutable_patients.length}
@@ -72,6 +81,9 @@ class DataSet extends Component {
                        setPageNum={this.props.setPageNum}
                        setPerPage={this.props.setPerPage}
                        sortDataSet={this.props.sortDataSet}
+                       setSeparatedBy={this.props.setSeparatedBy}
+                       setSortedBy={this.props.setSortedBy}
+                       setAscDesc={this.props.setAscDesc}
                 />
             </div>
         );
