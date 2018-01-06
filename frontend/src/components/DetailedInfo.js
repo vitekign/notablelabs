@@ -181,6 +181,7 @@ export default class DetailedInfo extends Component {
                             style={iconButtonStyle.small}>
                             <ArrowBack
                                 color={'#464646'}
+                                hoverColor={'#fe171c'}
                             > </ArrowBack>
                         </IconButton>
                     </Link>
