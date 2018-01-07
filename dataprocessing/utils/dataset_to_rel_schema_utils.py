@@ -18,9 +18,8 @@ def is_boolean(value):
 # for key, value in field_length.items():
 #   print(f'{key:55.50} : {value}')
 def find_types_of_the_fields(patients):
-    """Fetch values from all patients and save them in a map of sets.
-    Then, reduce the sets to one value, thus, producing the type of
-    value a corresponding field represents. """
+    """Fetch values from all patients and put them in a map of sets.
+    Then, reduce all individual sets into one value.  """
 
     field_types = {}
     for key, _ in patients[0].items():

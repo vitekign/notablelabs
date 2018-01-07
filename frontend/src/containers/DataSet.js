@@ -23,6 +23,7 @@ const mapStateToProps = (state) => {
         per_page: state.allShortFormattedPatients.perPage,
         fetching_all_patients: state.allShortFormattedPatients.fetching,
         user_input: state.allShortFormattedPatients.userInput,
+        sorted_by: state.allShortFormattedPatients.sortedBy,
     }
 };
 

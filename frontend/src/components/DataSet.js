@@ -76,6 +76,7 @@ class DataSet extends Component {
                        separation_criterion={this.props.separation_criterion}
                        toggle_value={this.props.toggle_value}
                        data_set_length={this.props.immutable_patients.length}
+                       sorted_by={this.props.sorted_by}
                        page_num={this.props.page_num}
                        per_page={this.props.per_page}
                        setPageNum={this.props.setPageNum}

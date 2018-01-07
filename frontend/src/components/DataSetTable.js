@@ -20,6 +20,7 @@ export default class DataSetTable extends Component {
                         page_num={this.props.page_num}
                         dataset={this.props.mutable_patients}
                         per_page={this.props.per_page}
+                        sorted_by={this.props.sorted_by}
                         setPageNum={this.props.setPageNum}
                         sortDataSet={this.props.sortDataSet}
                         setPerPage={this.props.setPerPage}

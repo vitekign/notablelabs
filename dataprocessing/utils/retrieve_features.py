@@ -1,9 +1,19 @@
 import os
 import sys
-sys.path.append('../')
-sys.path.append('../../')
-import django
 
+
+def include_upper_modules_to_pythonpath(level, p_path):
+    if level == 0:
+        return
+    p_path += f"..{os.path.sep}"
+    sys.path.append(p_path) if p_path not in sys.path else _
+    level -= 1
+    include_upper_modules_to_pythonpath(level, p_path)
+
+
+include_upper_modules_to_pythonpath(2, "")
+
+import django
 # # Must include the following two lines; otherwise, the module will crash!
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "notablelabs.settings")
 django.setup()
@@ -149,7 +159,6 @@ class MolecAbnormsResult:
 
 
 def populate_database():
-
     patients = open_file_and_convert_to_key_value_pairs()
     patient_non_nested_attrs = set(find_non_nested_features(patients))
 
@@ -183,7 +192,8 @@ def populate_database():
                                                    MolecAbnormsResult()).molecular_analysis_abnormality_testing_percentage_value = None
                 else:
                     molecul_abnorm_dict.setdefault(int(molec_abnorm_num),
-                                                   MolecAbnormsResult()).molecular_analysis_abnormality_testing_percentage_value = float(value)
+                                                   MolecAbnormsResult()).molecular_analysis_abnormality_testing_percentage_value = float(
+                        value)
 
             elif 'molecular_analysis_abnormality_testing_result' in key:
                 molec_abnorm_num = extract_number(key)
@@ -281,4 +291,4 @@ def populate_database():
 
 
 if __name__ == "__main__":
-    populate_database()
+    print("Hello")

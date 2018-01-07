@@ -33,7 +33,7 @@ class PaginatedTable extends Component {
         let page_num = this.props.page_num;
         if (page_num > 0)
             page_num -= 1;
-        if(page_num != this.props.page_num)
+        if (page_num != this.props.page_num)
             this.props.setPageNum(page_num)
     }
 
@@ -45,7 +45,7 @@ class PaginatedTable extends Component {
         let page_num = this.props.page_num;
         if ((page_num + 1) * this.props.per_page < this.props.dataset.length)
             page_num += 1;
-        if(page_num != this.props.page_num)
+        if (page_num != this.props.page_num)
             this.props.setPageNum(page_num)
     }
 
@@ -66,6 +66,7 @@ class PaginatedTable extends Component {
         let num_of_pages = Math.floor(this.props.dataset.length / this.props.per_page)
         if (this.props.dataset.length % this.props.per_page !== 0)
             num_of_pages++;
+        num_of_pages = num_of_pages === 0 ? 1 : num_of_pages;
 
         let table_rows_patients = this.props.dataset
             .filter((patient, i) => i < (this.props.page_num + 1) * this.props.per_page &&
@@ -84,22 +85,27 @@ class PaginatedTable extends Component {
                         <TableRowColumn>{patient.vital_status}</TableRowColumn>
                     </TableRow>
                 )
-
             })
 
         //Fill up the empty slots.
+        // Add/Remove additional height to/from the table when the search result is equal to 0
+        let additional_height = ""
+        let i = 0;
         while (table_rows_patients.length < this.props.per_page) {
+            additional_height = "1px solid white";
+            if (this.props.dataset.length === 0 && i == 0)
+                additional_height = "0px solid white";
             table_rows_patients.push(
-                <TableRow key={uuidv1()} style={{backgroundColor: "#ffffff", border: '1px solid white'}}>
+                <TableRow key={uuidv1()} style={{backgroundColor: "#ffffff", border: `${additional_height}`}}>
                     <TableRowColumn colSpan="5">
                     </TableRowColumn>
                 </TableRow>
             )
+            i++;
         }
 
         table_rows_patients.push(
-            <TableRow key={uuidv1()}
-                      style={{backgroundColor: "#ffffff", height: 'auto',}}>
+            <TableRow key={uuidv1()}>
                 <TableRowColumn colSpan="5">
 
                     <IconButton
@@ -161,7 +167,26 @@ class PaginatedTable extends Component {
         return table_rows_patients;
     }
 
+
     render() {
+
+        let bold_style = {
+            color: 'black',
+            fontWeight: 'bold'
+        }
+        let reg_style = {
+            color: 'grey',
+            fontWeight: 'normal'
+        }
+
+        let id_style = this.props.sorted_by === PATIENT_API_SHORT_FORMAT.ID ? bold_style : reg_style;
+        let gender_style = this.props.sorted_by === PATIENT_API_SHORT_FORMAT.GENDER ? bold_style : reg_style;
+        let ethnicity_style = this.props.sorted_by === PATIENT_API_SHORT_FORMAT.ETHNICITY ? bold_style : reg_style;
+        let platelet_result_count = this.props.sorted_by === PATIENT_API_SHORT_FORMAT.PLATELET_RESULT_COUNT ?
+            bold_style : reg_style
+        let vital_status = this.props.sorted_by === PATIENT_API_SHORT_FORMAT.VITAL_STATUS ?
+            bold_style : reg_style
+
         return (
             <Table
                 height={this.components_params.height}
@@ -175,19 +200,19 @@ class PaginatedTable extends Component {
                     enableSelectAll={this.components_params.enableSelectAll}>
 
                     <TableRow onCellClick={this.onCellClick.bind(this)}>
-                        <TableHeaderColumn tooltip="Patient's ID"
+                        <TableHeaderColumn style={id_style}
                                            id={PATIENT_API_SHORT_FORMAT.ID}>ID</TableHeaderColumn>
-                        <TableHeaderColumn tooltip="Patient's Gender"
+                        <TableHeaderColumn style={gender_style}
                                            id={PATIENT_API_SHORT_FORMAT.GENDER}>Gender
                         </TableHeaderColumn>
-                        <TableHeaderColumn tooltip="Patient's Ethnicity"
+                        <TableHeaderColumn style={ethnicity_style}
                                            id={PATIENT_API_SHORT_FORMAT.ETHNICITY}>Ethnicity
                         </TableHeaderColumn>
-                        <TableHeaderColumn tooltip="Patient's Platelet Result Count"
+                        <TableHeaderColumn style={platelet_result_count}
                                            id={PATIENT_API_SHORT_FORMAT.PLATELET_RESULT_COUNT}>
                             Platelet Result
                             Count</TableHeaderColumn>
-                        <TableHeaderColumn tooltip="Patient's Vital Status"
+                        <TableHeaderColumn style={vital_status}
                                            id={PATIENT_API_SHORT_FORMAT.VITAL_STATUS}>Vital
                             Status
                         </TableHeaderColumn>
