@@ -40,10 +40,6 @@ const style_secondary = {
 
 
 class Panel extends Component {
-    constructor(props) {
-        super(props)
-    }
-
     render() {
         return (
             <div style={{marginTop: '25px'}}>

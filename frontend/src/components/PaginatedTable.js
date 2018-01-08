@@ -33,7 +33,7 @@ class PaginatedTable extends Component {
         let page_num = this.props.page_num;
         if (page_num > 0)
             page_num -= 1;
-        if (page_num != this.props.page_num)
+        if (page_num !== this.props.page_num)
             this.props.setPageNum(page_num)
     }
 
@@ -45,7 +45,7 @@ class PaginatedTable extends Component {
         let page_num = this.props.page_num;
         if ((page_num + 1) * this.props.per_page < this.props.dataset.length)
             page_num += 1;
-        if (page_num != this.props.page_num)
+        if (page_num !== this.props.page_num)
             this.props.setPageNum(page_num)
     }
 
@@ -93,7 +93,7 @@ class PaginatedTable extends Component {
         let i = 0;
         while (table_rows_patients.length < this.props.per_page) {
             additional_height = "1px solid white";
-            if (this.props.dataset.length === 0 && i == 0)
+            if (this.props.dataset.length === 0 && i === 0)
                 additional_height = "0px solid white";
             table_rows_patients.push(
                 <TableRow key={uuidv1()} style={{backgroundColor: "#ffffff", border: `${additional_height}`}}>

@@ -7,12 +7,8 @@ import SeparatedTable from "./SeparatedTable";
 
 
 export default class DataSetTable extends Component {
-    constructor(props) {
-        super(props);
-    }
-
     render() {
-        if (this.props.toggle_value == 1)
+        if (this.props.toggle_value === 1)
             return (
                 <Paper style={{marginLeft: '10px', width: '98%'}}
                        zDepth={2}>

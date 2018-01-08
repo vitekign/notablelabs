@@ -5,7 +5,7 @@ import {Provider} from 'react-redux'
 import App from './App';
 import {DEBUG_MODE} from './constants/Constants'
 import {
-    loadAllShortFormattedPatients, sort
+    loadAllShortFormattedPatients
 } from './redux/actions'
 import sampleData from './redux/InitialState.json'
 import storeFactory from './redux/store/index'

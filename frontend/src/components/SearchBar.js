@@ -5,9 +5,6 @@ import {styles} from '../media/styles/Search_style'
 import {MAX_LENGTH_USER_INPUT} from './../constants/Constants'
 
 class Search extends Component {
-    constructor(){
-        super();
-    }
 
     handleUpdateInput(event, userInput) {
         this.props.update(userInput.slice(0, MAX_LENGTH_USER_INPUT));

@@ -6,7 +6,6 @@ import {
     TableHeader, TableBody, Table
 } from "material-ui";
 
-import uuidv1 from 'uuid/v1'
 import {BREAK_ROWS_BY, PATIENT_API_SHORT_FORMAT} from './../constants/Constants'
 
 class SeparatedTable extends Component {

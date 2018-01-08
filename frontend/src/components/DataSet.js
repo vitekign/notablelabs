@@ -7,13 +7,6 @@ import SearchBar from './SearchBar'
 import DataSetTable from './DataSetTable'
 
 class DataSet extends Component {
-
-
-    constructor(props){
-        super(props)
-    }
-
-
     render() {
         if (this.props.fetching_all_patients)
             return (

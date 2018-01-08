@@ -16,7 +16,6 @@ import {RELOADING_COLOR} from "../constants/Constants"
 import Panel from "./Panel";
 import Clear from 'material-ui-icons/Clear'
 import Add from 'material-ui-icons/Add'
-import Highlight from 'react-highlighter' //TODO: Remove it from dependencies, sometimes causes weird bugs.
 
 export default class DetailedInfo extends Component {
     constructor(props) {
