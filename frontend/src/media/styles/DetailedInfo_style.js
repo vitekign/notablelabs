@@ -13,15 +13,14 @@ const iconButtonStyle = {
         height: 60,
     },
     small: {
-        marginTop: 30,
+        marginTop: 10,
         width: 72,
         height: 72,
-        padding: 16,
+
     },
     medium: {
         width: 96,
         height: 96,
-        padding: 24,
     },
     large: {
         width: 120,

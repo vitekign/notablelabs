@@ -21,6 +21,14 @@
       "vital_status": 0
     }
   },
+  "showSubTables": {
+    "patientDetails": true,
+    "admin": true,
+    "cytogeneticAbnormalities": true,
+    "fishTestComponentResults": true,
+    "immunophenotypeCytochemistryTestingResults": true,
+    "molecularAnalysisAbnormalityTestingResults": true
+  },
   "fetchingDetails": false,
   "curDetails": {
     "patientDetails": [],

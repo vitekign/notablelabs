@@ -87,7 +87,7 @@ class PaginatedTable extends Component {
                 )
             })
 
-        //Fill up the empty slots.
+        // Fill up the empty slots.
         // Add/Remove additional height to/from the table when the search result is equal to 0
         let additional_height = ""
         let i = 0;
@@ -172,11 +172,13 @@ class PaginatedTable extends Component {
 
         let bold_style = {
             color: 'black',
-            fontWeight: 'bold'
+            fontWeight: 'bold',
+            cursor: 'pointer',
         }
         let reg_style = {
             color: 'grey',
-            fontWeight: 'normal'
+            fontWeight: 'normal',
+            cursor: 'pointer',
         }
 
         let id_style = this.props.sorted_by === PATIENT_API_SHORT_FORMAT.ID ? bold_style : reg_style;
@@ -200,7 +202,9 @@ class PaginatedTable extends Component {
                     enableSelectAll={this.components_params.enableSelectAll}>
 
                     <TableRow onCellClick={this.onCellClick.bind(this)}>
-                        <TableHeaderColumn style={id_style}
+                        <TableHeaderColumn
+                                            hoverColor={'#fe171c'}
+                                            style={id_style}
                                            id={PATIENT_API_SHORT_FORMAT.ID}>ID</TableHeaderColumn>
                         <TableHeaderColumn style={gender_style}
                                            id={PATIENT_API_SHORT_FORMAT.GENDER}>Gender

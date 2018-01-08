@@ -65,6 +65,12 @@ export const setAscDesc = (criterion) => ({
     payload: criterion
 });
 
+
+export const setShowSubtables = (criterion) => ({
+    type: C.SET_SUBTABLE_SHOW,
+    payload: criterion
+});
+
 export const sort = () => (dispatch, getState) => {
 
     if (getState().allShortFormattedPatients.toggleValue === 1) {

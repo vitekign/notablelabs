@@ -13,6 +13,10 @@ import {iconButtonStyle} from "../media/styles/DetailedInfo_style";
 import {process_headers, process_strings} from '../utils/Utils'
 import SearchBar from "./SearchBar"
 import {RELOADING_COLOR} from "../constants/Constants"
+import Panel from "./Panel";
+import Clear from 'material-ui-icons/Clear'
+import Add from 'material-ui-icons/Add'
+import Highlight from 'react-highlighter' //TODO: Remove it from dependencies, sometimes causes weird bugs.
 
 export default class DetailedInfo extends Component {
     constructor(props) {
@@ -36,6 +40,8 @@ export default class DetailedInfo extends Component {
             "immunophenotypeCytochemistryTestingResults",
             "molecular_analysis_abnormality_testing_results",
             "fishTestComponentResults"]);
+
+        this.state = {user_input: ''}
     }
 
     componentWillMount() {
@@ -43,14 +49,19 @@ export default class DetailedInfo extends Component {
         this.props.loadDetailedInfoForAPatient();
     }
 
+    //TODO: Refactor!!! Not good to change props!!!
     updateDetailsInTables(details, user_input) {
         this.props.filterPatientDetails(user_input);
+        this.setState({user_input: user_input})
     }
 
     addRows(nested_features, cur_field) {
+        const build_this_table = this.props.show_sub_tables[cur_field];
+        if (build_this_table === false)
+            return ""
         const pair_rows_to_skip = new Set(["NA"]);
-        let features_to_skip = new Set(['id', 'patient_withdrawal']);
-        let rows = [];
+        const features_to_skip = new Set(['id', 'patient_withdrawal']);
+        const rows = [];
         if (!this.pair_wise_tables.has(cur_field)) {
             for (let i = 0; i < nested_features.length; i++) {
                 for (let key in nested_features[i]) {
@@ -61,7 +72,7 @@ export default class DetailedInfo extends Component {
                         <TableRow key={uuidv1()}>
                             <TableRowColumn> {process_strings(String(key))} </TableRowColumn>
                             <TableRowColumn style={{textAlign: 'left'}}>
-                                {nested_features[i][key]}
+                                    {nested_features[i][key]}
                             </TableRowColumn>
                         </TableRow>
                     )
@@ -88,18 +99,38 @@ export default class DetailedInfo extends Component {
         return rows;
     }
 
+    onTableCloseOpen(table_name) {
+        this.props.changeShowSubTables(table_name);
+    }
 
     createTables(nested_features) {
-        let nested_tables = [];
+        const nested_tables = [];
 
         for (let i = 0; i < Object.keys(nested_features).length; i++) {
             let cur_field = Object.keys(nested_features)[i];
             if (_.every(nested_features[cur_field], _.isEmpty)) {
                 continue;
             }
+            const build_this_table = this.props.show_sub_tables[cur_field];
+            let table_margin_bottom = "50px";
+            let close_open_label = (
+                <Clear
+                    hoverColor={'#fe171c'}
+                    color={'white'}
+                > </Clear>
+            )
+            if (build_this_table === false) {
+                close_open_label = (
+                    <Add
+                        hoverColor={'#0ac000'}
+                        color={'white'}
+                    > </Add>
+                )
+                table_margin_bottom = "5px";
+            }
 
             nested_tables.push(
-                <Paper key={uuidv1()} style={{marginLeft: '20px', width: '95%', marginTop: '50px'}}
+                <Paper key={uuidv1()} style={{marginLeft: '20px', width: '95%', marginBottom: `${table_margin_bottom}`}}
                        zDepth={2}>
                     <Table
                         key={uuidv1()}
@@ -113,17 +144,24 @@ export default class DetailedInfo extends Component {
                             adjustForCheckbox={this.components_params.showCheckboxes}
                             enableSelectAll={this.components_params.enableSelectAll}>
 
-                            <TableRow style={{backgroundColor: "#222d38"}}
+                            <TableRow style={{background: 'linear-gradient(to bottom, #171B23 50%,rgba(20,25,31,1) 50%)'}}
                                       key={uuidv1()} colSpan={3}>
                                 <TableHeaderColumn colSpan={2} style={{
                                     marginLeft: '20px',
-                                    color: 'white'
+                                    color: 'white',
                                 }}>
-                                    <h2>{process_headers(Object.keys(nested_features)[i])}</h2>
+                                    <h2 style={{float: 'left'}}>{process_headers(Object.keys(nested_features)[i])}</h2>
+
+                                    <IconButton
+                                        style={{float: 'right'}}
+                                        onClick={this.onTableCloseOpen.bind(this, `${cur_field}`)}>
+                                        {close_open_label}
+                                    </IconButton>
                                 </TableHeaderColumn>
+
                             </TableRow>
 
-                            {this.pair_wise_tables.has(cur_field) ?
+                            {this.pair_wise_tables.has(cur_field) && build_this_table ?
                                 <TableRow key={uuidv1()}>
                                     <TableHeaderColumn>
                                         {process_strings(
@@ -144,7 +182,9 @@ export default class DetailedInfo extends Component {
                             deselectOnClickaway={false}
                             showRowHover={false}
                             stripedRows={false}>
+
                             {this.addRows(nested_features[cur_field], cur_field)}
+
                         </TableBody>
                     </Table>
                 </Paper>
@@ -185,13 +225,23 @@ export default class DetailedInfo extends Component {
                             > </ArrowBack>
                         </IconButton>
                     </Link>
-                    <SearchBar
-                        update={this.updateDetailsInTables.bind(this, details)}
-                        floatingLabelText={"Search"}
-                        hintText={"Search data set."}
-                        margin={"22px"}
-                        width={"94%"}>
-                    </SearchBar>
+
+                    {/*<div></div>*/}
+                    {/*<Panel*/}
+                    {/*detailed_info={this.props.detailed_info}>*/}
+                    {/*</Panel>*/}
+                    {/*<div></div>*/}
+
+                    <div style={{marginBottom: '5px', marginTop: '-30px'}}>
+                        <SearchBar
+                            update={this.updateDetailsInTables.bind(this, details)}
+                            floatingLabelText={"Search"}
+                            hintText={"Search data set."}
+                            margin={"22px"}
+                            width={"94%"}
+                        >
+                        </SearchBar>
+                    </div>
 
                     {this.createTables(details)}
 

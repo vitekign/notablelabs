@@ -1,8 +1,9 @@
 import {connect} from 'react-redux'
 
 import DetailedInfo from '../components/DetailedInfo'
-import {filterDetails, loadDetailedInfoForAPatient, filterAdmin,
-    filterImmuno, filterMolecular, setCurrentDetailedPatientNum, filterFishTests, filterAbnormalities
+import {
+    filterDetails, loadDetailedInfoForAPatient, filterAdmin,
+    filterImmuno, filterMolecular, setCurrentDetailedPatientNum, filterFishTests, filterAbnormalities, setShowSubtables
 } from '../redux/actions'
 import {MAX_LENGTH_USER_INPUT} from "../constants/Constants";
 
@@ -10,7 +11,8 @@ const mapStateToProps = (state) => {
     return {
         detailed_info: state.patientDetailedInfo,
         detailed_info_immutable: state.patientDetailedInfoImmutable,
-        fetchingDetails: state.fetchingDetails
+        fetchingDetails: state.fetchingDetails,
+        show_sub_tables: state.showSubTables,
     }
 };
 
@@ -21,6 +23,12 @@ const mapDispatchToProps = (dispatch,) => {
                 loadDetailedInfoForAPatient()
             )
         },
+        changeShowSubTables(table_name){
+            dispatch(
+                setShowSubtables(table_name)
+            )
+        },
+
         filterPatientDetails(user_input) {
             user_input = String(user_input).toLowerCase().slice(0, MAX_LENGTH_USER_INPUT);
 

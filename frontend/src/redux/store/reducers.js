@@ -338,6 +338,18 @@ export const molecularAnalysisAbnormalityTestingResultsImmutable = (state = [], 
 };
 
 
+export const showSubTables = (state = [], action) => {
+    switch (action.type) {
+        case C.SET_SUBTABLE_SHOW:
+            let newState = {...state};
+            newState[action.payload] = newState[action.payload] === true ? false : true;
+            return newState;
+        default:
+            return state;
+    }
+};
+
+
 export default combineReducers({
     allShortFormattedPatients: combineReducers({
         allPatients,
@@ -353,6 +365,7 @@ export default combineReducers({
         sortAscDesc,
         currentDetailedPatientNum,
     }),
+    showSubTables,
     fetchingDetails,
     patientDetailedInfo: combineReducers({
         patientDetails,
